@@ -11,11 +11,11 @@ export default class ProductManager {
     async #readingJSON(){
         try {
             const data = await fs.promises.readFile(this.#path, 'utf-8');
-            const dataJSON = JSON.parse(data);
-            return dataJSON;
+            return data ? JSON.parse(data) : [];
         } 
         catch (error) {
             console.log(error);
+            return []
         }
     }
     async #fileSaving(item){
@@ -30,11 +30,10 @@ export default class ProductManager {
     async addProducts(item){
         try {
             const products = await this.#readingJSON();               
-                item.id = randomUUID();
-                products.push(item);
-                this.#fileSaving(products);
-                console.log('Product add');
-            
+            item.id = randomUUID();
+            products.push(item);
+            this.#fileSaving(products);
+            console.log('Product add');
         } 
         catch (error) {
             console.log(error);
@@ -42,10 +41,12 @@ export default class ProductManager {
     }
     async getProducts(){
         try {
-            return await this.#readingJSON();
+            const product = await this.#readingJSON();
+            return !product ? await this.#fileSaving(product) : product;
         } 
         catch (error) {
             console.log(error);
+            return []
         }
     }
     async getProductsById(id){
@@ -61,16 +62,15 @@ export default class ProductManager {
             console.log(error);
         }
     }
-    async updateProduct(item){
+    async updateProduct(id, item){
         try {
             const product = await this.#readingJSON();
-            const productId = product.findIndex(product => product.id === item.id)
+            const productId = product.findIndex(product => product.id === id);
             if(productId >= 0){
-                product[productId] = item
+                item.id = id
+                product[productId] = item;
                 await this.#fileSaving(product);
-                console.log('Update');
-            } else {
-                console.log('Error not found');
+                return product[productId];
             }
         } 
         catch (error) {
@@ -79,15 +79,13 @@ export default class ProductManager {
     }
     async deleteProduct(id){
         try {
-            const product = await this.#readingJSON();
-            const productId = product.findIndex(item => item.id === id);
-            if(productId >= 0) {
-                product.splice(productId, 1);
-                await this.#fileSaving(product);
-                console.log('Product delete');
-            } else {
-                console.log('Error not found');
+            const allProduct = await this.#readingJSON();
+            const deleteProduct = allProduct.findIndex(item => item.id === id);
+            if(deleteProduct >= 0) {
+                allProduct.splice(deleteProduct, 1);
+                await this.#fileSaving(allProduct);
             }
+            return deleteProduct;
         } 
         catch (error) {
             console.log(error);

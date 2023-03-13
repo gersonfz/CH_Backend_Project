@@ -5,7 +5,10 @@ import ProductsController from "../../controller/product.controller.js";
 const productsRouter = Router();
 
 productsRouter.get('/', ProductsController.getProducts);
+productsRouter.get('/:pid', ProductsController.getProductsById);
 productsRouter.post('/', ProductsController.addProducts);
+productsRouter.put('/:pid', ProductsController.updateProducts);
+productsRouter.delete('/:pid', ProductsController.deleteProduct);
 
 
 export default productsRouter;
