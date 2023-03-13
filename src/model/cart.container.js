@@ -72,8 +72,6 @@ export default class CartContainer {
 
                 } else {
 
-                    const productQty = allCarts[cartIndex].products.findIndex(qty => qty.qty );
-                    console.log(productQty);
                     allCarts[cartIndex].products.push({
                         id: pid,
                         qty: 1
